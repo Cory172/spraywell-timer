@@ -1,18 +1,15 @@
 function makeTicks(cx, cy, value, maxValue, segments = 60) {
-  // value: current unit (days / hours / minutes / seconds)
-  // maxValue: how many units is "full" (60 for sec/min, 24 for hours, etc.)
-  // segments: how many slices around the circle (we'll use 60)
   let svg = "";
-  const outerR = 80;   // was 60
-  const innerR = 65;   // was 50
+  const outerR = 80;
+  const innerR = 65;
 
-  // normalize value to segment count
+  // Normalize value to segment count
   const activeSegments = Math.round(
     Math.max(0, Math.min(1, value / maxValue)) * segments
   );
 
   for (let i = 0; i < segments; i++) {
-    const angle = (i / segments) * 2 * Math.PI - Math.PI / 2; // start at top
+    const angle = (i / segments) * 2 * Math.PI - Math.PI / 2;
     const x1 = cx + innerR * Math.cos(angle);
     const y1 = cy + innerR * Math.sin(angle);
     const x2 = cx + outerR * Math.cos(angle);
@@ -20,9 +17,10 @@ function makeTicks(cx, cy, value, maxValue, segments = 60) {
 
     const color = i < activeSegments ? "#7cc516" : "#222222";
 
-    svg += `<line x1="${x1.toFixed(2)}" y1="${y1.toFixed(2)}" x2="${x2.toFixed(
-      2
-    )}" y2="${y2.toFixed(2)}" stroke="${color}" stroke-width="3" />`;
+    svg += `<line filter="url(#glow)"
+      x1="${x1.toFixed(2)}" y1="${y1.toFixed(2)}"
+      x2="${x2.toFixed(2)}" y2="${y2.toFixed(2)}"
+      stroke="${color}" stroke-width="3" />`;
   }
 
   return svg;
@@ -35,7 +33,7 @@ export default function handler(req, res) {
 
   const now = new Date();
   let diff = endDate - now;
-  if (diff < 0) diff = 0;
+  if (diff < 0) diff = 0; // Freeze at 0
 
   const totalSeconds = Math.floor(diff / 1000);
   const days = Math.floor(totalSeconds / 86400);
@@ -48,7 +46,7 @@ export default function handler(req, res) {
   const m = String(minutes).padStart(2, "0");
   const s = String(seconds).padStart(2, "0");
 
-  // centers for the four circles
+  // Centers for the four circles
   const cy = 100;
   const cxDays = 110;
   const cxHours = 290;
@@ -60,13 +58,13 @@ export default function handler(req, res) {
   const minutesTicks = makeTicks(cxMinutes, cy, minutes, 60, 60);
   const secondsTicks = makeTicks(cxSeconds, cy, seconds, 60, 60);
 
-  const svg = `<?xml version="1.0" encoding="UTF-8"?>  
+  const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg width="760" height="200" viewBox="0 0 760 200" xmlns="http://www.w3.org/2000/svg">
 
-<!-- Glow definition MUST come first -->
+  <!-- Glow filter (must be first) -->
   <defs>
     <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feGaussianBlur stdDeviation="5" result="coloredBlur"/>
       <feMerge>
         <feMergeNode in="coloredBlur"/>
         <feMergeNode in="SourceGraphic"/>
@@ -77,53 +75,38 @@ export default function handler(req, res) {
   <!-- Black background -->
   <rect width="760" height="200" fill="#000000" />
 
-  <!-- DAYS circle -->
+  <!-- DAYS -->
   ${daysTicks}
   <circle cx="${cxDays}" cy="${cy}" r="60" fill="#000000" />
   <text x="${cxDays}" y="${cy - 5}" text-anchor="middle" fill="#ffffff"
-    font-family="Arial, sans-serif" font-size="42" font-weight="bold">
-    ${d}
-  </text>
-  <text x="${cxDays}" y="${cy + 18}" text-anchor="middle" fill="#cccccc"
-    font-family="Arial, sans-serif" font-size="18" letter-spacing="1">
-    DAYS
-  </text>
+    font-family="Arial, sans-serif" font-size="42" font-weight="bold">${d}</text>
+  <text x="${cxDays}" y="${cy + 22}" text-anchor="middle" fill="#cccccc"
+    font-family="Arial, sans-serif" font-size="18" letter-spacing="1">DAYS</text>
 
-  <!-- HOURS circle -->
+  <!-- HOURS -->
   ${hoursTicks}
   <circle cx="${cxHours}" cy="${cy}" r="60" fill="#000000" />
   <text x="${cxHours}" y="${cy - 5}" text-anchor="middle" fill="#ffffff"
-    font-family="Arial, sans-serif" font-size="42" font-weight="bold">
-    ${h}
-  </text>
-  <text x="${cxHours}" y="${cy + 18}" text-anchor="middle" fill="#cccccc"
-    font-family="Arial, sans-serif" font-size="18" letter-spacing="1">
-    HOURS
-  </text>
+    font-family="Arial, sans-serif" font-size="42" font-weight="bold">${h}</text>
+  <text x="${cxHours}" y="${cy + 22}" text-anchor="middle" fill="#cccccc"
+    font-family="Arial, sans-serif" font-size="18" letter-spacing="1">HOURS</text>
 
-  <!-- MINUTES circle -->
+  <!-- MINUTES -->
   ${minutesTicks}
   <circle cx="${cxMinutes}" cy="${cy}" r="60" fill="#000000" />
   <text x="${cxMinutes}" y="${cy - 5}" text-anchor="middle" fill="#ffffff"
-    font-family="Arial, sans-serif" font-size="42" font-weight="bold">
-    ${m}
-  </text>
-  <text x="${cxMinutes}" y="${cy + 18}" text-anchor="middle" fill="#cccccc"
-    font-family="Arial, sans-serif" font-size="18" letter-spacing="1">
-    MINUTES
-  </text>
+    font-family="Arial, sans-serif" font-size="42" font-weight="bold">${m}</text>
+  <text x="${cxMinutes}" y="${cy + 22}" text-anchor="middle" fill="#cccccc"
+    font-family="Arial, sans-serif" font-size="18" letter-spacing="1">MINUTES</text>
 
-  <!-- SECONDS circle -->
+  <!-- SECONDS -->
   ${secondsTicks}
   <circle cx="${cxSeconds}" cy="${cy}" r="60" fill="#000000" />
   <text x="${cxSeconds}" y="${cy - 5}" text-anchor="middle" fill="#ffffff"
-    font-family="Arial, sans-serif" font-size="42" font-weight="bold">
-    ${s}
-  </text>
-  <text x="${cxSeconds}" y="${cy + 18}" text-anchor="middle" fill="#cccccc"
-    font-family="Arial, sans-serif" font-size="18" letter-spacing="1">
-    SECONDS
-  </text>
+    font-family="Arial, sans-serif" font-size="42" font-weight="bold">${s}</text>
+  <text x="${cxSeconds}" y="${cy + 22}" text-anchor="middle" fill="#cccccc"
+    font-family="Arial, sans-serif" font-size="18" letter-spacing="1">SECONDS</text>
+
 </svg>`;
 
   res.setHeader("Content-Type", "image/svg+xml");
