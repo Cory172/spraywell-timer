@@ -67,7 +67,7 @@ export default function handler(req, res) {
 
   <!-- DAYS circle -->
   ${daysTicks}
-  <circle cx="${cxDays}" cy="${cy}" r="46" fill="#000000" />
+  <circle cx="${cxDays}" cy="${cy}" r="60" fill="#000000" />
   <text x="${cxDays}" y="${cy - 5}" text-anchor="middle" fill="#ffffff"
     font-family="Arial, sans-serif" font-size="30" font-weight="bold">
     ${d}
@@ -79,7 +79,7 @@ export default function handler(req, res) {
 
   <!-- HOURS circle -->
   ${hoursTicks}
-  <circle cx="${cxHours}" cy="${cy}" r="46" fill="#000000" />
+  <circle cx="${cxHours}" cy="${cy}" r="60" fill="#000000" />
   <text x="${cxHours}" y="${cy - 5}" text-anchor="middle" fill="#ffffff"
     font-family="Arial, sans-serif" font-size="30" font-weight="bold">
     ${h}
@@ -91,7 +91,7 @@ export default function handler(req, res) {
 
   <!-- MINUTES circle -->
   ${minutesTicks}
-  <circle cx="${cxMinutes}" cy="${cy}" r="46" fill="#000000" />
+  <circle cx="${cxMinutes}" cy="${cy}" r="60" fill="#000000" />
   <text x="${cxMinutes}" y="${cy - 5}" text-anchor="middle" fill="#ffffff"
     font-family="Arial, sans-serif" font-size="30" font-weight="bold">
     ${m}
@@ -103,7 +103,7 @@ export default function handler(req, res) {
 
   <!-- SECONDS circle -->
   ${secondsTicks}
-  <circle cx="${cxSeconds}" cy="${cy}" r="46" fill="#000000" />
+  <circle cx="${cxSeconds}" cy="${cy}" r="60" fill="#000000" />
   <text x="${cxSeconds}" y="${cy - 5}" text-anchor="middle" fill="#ffffff"
     font-family="Arial, sans-serif" font-size="30" font-weight="bold">
     ${s}
