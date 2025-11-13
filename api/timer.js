@@ -62,7 +62,7 @@ export default function handler(req, res) {
 <svg width="760" height="200" viewBox="0 0 760 200" xmlns="http://www.w3.org/2000/svg">
 
   <!-- Black background -->
-  <rect width="760" height="200" fill="#000000" />
+  <rect width="760" height="200" fill="#0D0D0D" />
 
   <!-- DAYS -->
   ${daysTicks}
