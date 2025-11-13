@@ -29,7 +29,7 @@ function makeTicks(cx, cy, value, maxValue, segments = 60) {
 export default function handler(req, res) {
   const endDate = req.query.end
     ? new Date(req.query.end)
-    : new Date("2025-11-27T23:59:00");
+    : new Date("2025-11-28T00:00:00-05:00");
 
   const now = new Date();
   let diff = endDate - now;
