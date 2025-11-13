@@ -65,6 +65,17 @@ export default function handler(req, res) {
   <!-- Black background -->
   <rect width="760" height="200" fill="#000000" />
 
+  <defs>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+
   <!-- DAYS circle -->
   ${daysTicks}
   <circle cx="${cxDays}" cy="${cy}" r="60" fill="#000000" />
