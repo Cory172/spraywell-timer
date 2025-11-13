@@ -1,3 +1,33 @@
+function makeTicks(cx, cy, value, maxValue, segments = 60) {
+  // value: current unit (days / hours / minutes / seconds)
+  // maxValue: how many units is "full" (60 for sec/min, 24 for hours, etc.)
+  // segments: how many slices around the circle (we'll use 60)
+  let svg = "";
+  const outerR = 60;  // outer radius of tick
+  const innerR = 50;  // inner radius of tick
+
+  // normalize value to segment count
+  const activeSegments = Math.round(
+    Math.max(0, Math.min(1, value / maxValue)) * segments
+  );
+
+  for (let i = 0; i < segments; i++) {
+    const angle = (i / segments) * 2 * Math.PI - Math.PI / 2; // start at top
+    const x1 = cx + innerR * Math.cos(angle);
+    const y1 = cy + innerR * Math.sin(angle);
+    const x2 = cx + outerR * Math.cos(angle);
+    const y2 = cy + outerR * Math.sin(angle);
+
+    const color = i < activeSegments ? "#0a2f89" : "#222222";
+
+    svg += `<line x1="${x1.toFixed(2)}" y1="${y1.toFixed(2)}" x2="${x2.toFixed(
+      2
+    )}" y2="${y2.toFixed(2)}" stroke="${color}" stroke-width="3" />`;
+  }
+
+  return svg;
+}
+
 export default function handler(req, res) {
   const endDate = req.query.end
     ? new Date(req.query.end)
@@ -18,53 +48,70 @@ export default function handler(req, res) {
   const m = String(minutes).padStart(2, "0");
   const s = String(seconds).padStart(2, "0");
 
+  // centers for the four circles
+  const cy = 100;
+  const cxDays = 110;
+  const cxHours = 290;
+  const cxMinutes = 470;
+  const cxSeconds = 650;
+
+  const daysTicks = makeTicks(cxDays, cy, Math.min(days, 60), 60, 60);
+  const hoursTicks = makeTicks(cxHours, cy, hours, 24, 60);
+  const minutesTicks = makeTicks(cxMinutes, cy, minutes, 60, 60);
+  const secondsTicks = makeTicks(cxSeconds, cy, seconds, 60, 60);
+
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
-<svg width="700" height="180" viewBox="0 0 700 180" xmlns="http://www.w3.org/2000/svg">
-  <rect width="700" height="180" fill="#ffffff" />
+<svg width="760" height="200" viewBox="0 0 760 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Black background -->
+  <rect width="760" height="200" fill="#000000" />
 
-  <!-- Group 1: DAYS -->
-  <g transform="translate(100,90)">
-    <circle r="60" fill="#ffffff" stroke="#d4a037" stroke-width="10" />
-    <text x="0" y="-5" text-anchor="middle" fill="#111111" font-family="Arial, sans-serif" font-size="32" font-weight="bold">
-      ${d}
-    </text>
-    <text x="0" y="20" text-anchor="middle" fill="#555555" font-family="Arial, sans-serif" font-size="12" letter-spacing="1">
-      DAYS
-    </text>
-  </g>
+  <!-- DAYS circle -->
+  ${daysTicks}
+  <circle cx="${cxDays}" cy="${cy}" r="46" fill="#000000" />
+  <text x="${cxDays}" y="${cy - 5}" text-anchor="middle" fill="#ffffff"
+    font-family="Arial, sans-serif" font-size="30" font-weight="bold">
+    ${d}
+  </text>
+  <text x="${cxDays}" y="${cy + 18}" text-anchor="middle" fill="#cccccc"
+    font-family="Arial, sans-serif" font-size="11" letter-spacing="1">
+    DAYS
+  </text>
 
-  <!-- Group 2: HOURS -->
-  <g transform="translate(260,90)">
-    <circle r="60" fill="#ffffff" stroke="#d4a037" stroke-width="10" />
-    <text x="0" y="-5" text-anchor="middle" fill="#111111" font-family="Arial, sans-serif" font-size="32" font-weight="bold">
-      ${h}
-    </text>
-    <text x="0" y="20" text-anchor="middle" fill="#555555" font-family="Arial, sans-serif" font-size="12" letter-spacing="1">
-      HOURS
-    </text>
-  </g>
+  <!-- HOURS circle -->
+  ${hoursTicks}
+  <circle cx="${cxHours}" cy="${cy}" r="46" fill="#000000" />
+  <text x="${cxHours}" y="${cy - 5}" text-anchor="middle" fill="#ffffff"
+    font-family="Arial, sans-serif" font-size="30" font-weight="bold">
+    ${h}
+  </text>
+  <text x="${cxHours}" y="${cy + 18}" text-anchor="middle" fill="#cccccc"
+    font-family="Arial, sans-serif" font-size="11" letter-spacing="1">
+    HOURS
+  </text>
 
-  <!-- Group 3: MINUTES -->
-  <g transform="translate(420,90)">
-    <circle r="60" fill="#ffffff" stroke="#d4a037" stroke-width="10" />
-    <text x="0" y="-5" text-anchor="middle" fill="#111111" font-family="Arial, sans-serif" font-size="32" font-weight="bold">
-      ${m}
-    </text>
-    <text x="0" y="20" text-anchor="middle" fill="#555555" font-family="Arial, sans-serif" font-size="12" letter-spacing="1">
-      MINUTES
-    </text>
-  </g>
+  <!-- MINUTES circle -->
+  ${minutesTicks}
+  <circle cx="${cxMinutes}" cy="${cy}" r="46" fill="#000000" />
+  <text x="${cxMinutes}" y="${cy - 5}" text-anchor="middle" fill="#ffffff"
+    font-family="Arial, sans-serif" font-size="30" font-weight="bold">
+    ${m}
+  </text>
+  <text x="${cxMinutes}" y="${cy + 18}" text-anchor="middle" fill="#cccccc"
+    font-family="Arial, sans-serif" font-size="11" letter-spacing="1">
+    MINUTES
+  </text>
 
-  <!-- Group 4: SECONDS -->
-  <g transform="translate(580,90)">
-    <circle r="60" fill="#ffffff" stroke="#d4a037" stroke-width="10" />
-    <text x="0" y="-5" text-anchor="middle" fill="#111111" font-family="Arial, sans-serif" font-size="32" font-weight="bold">
-      ${s}
-    </text>
-    <text x="0" y="20" text-anchor="middle" fill="#555555" font-family="Arial, sans-serif" font-size="12" letter-spacing="1">
-      SECONDS
-    </text>
-  </g>
+  <!-- SECONDS circle -->
+  ${secondsTicks}
+  <circle cx="${cxSeconds}" cy="${cy}" r="46" fill="#000000" />
+  <text x="${cxSeconds}" y="${cy - 5}" text-anchor="middle" fill="#ffffff"
+    font-family="Arial, sans-serif" font-size="30" font-weight="bold">
+    ${s}
+  </text>
+  <text x="${cxSeconds}" y="${cy + 18}" text-anchor="middle" fill="#cccccc"
+    font-family="Arial, sans-serif" font-size="11" letter-spacing="1">
+    SECONDS
+  </text>
 </svg>`;
 
   res.setHeader("Content-Type", "image/svg+xml");
