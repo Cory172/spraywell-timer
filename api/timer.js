@@ -73,7 +73,7 @@ export default function handler(req, res) {
     ${d}
   </text>
   <text x="${cxDays}" y="${cy + 18}" text-anchor="middle" fill="#cccccc"
-    font-family="Arial, sans-serif" font-size="23" letter-spacing="1">
+    font-family="Arial, sans-serif" font-size="18" letter-spacing="1">
     DAYS
   </text>
 
@@ -85,7 +85,7 @@ export default function handler(req, res) {
     ${h}
   </text>
   <text x="${cxHours}" y="${cy + 18}" text-anchor="middle" fill="#cccccc"
-    font-family="Arial, sans-serif" font-size="23" letter-spacing="1">
+    font-family="Arial, sans-serif" font-size="18" letter-spacing="1">
     HOURS
   </text>
 
@@ -97,7 +97,7 @@ export default function handler(req, res) {
     ${m}
   </text>
   <text x="${cxMinutes}" y="${cy + 18}" text-anchor="middle" fill="#cccccc"
-    font-family="Arial, sans-serif" font-size="23" letter-spacing="1">
+    font-family="Arial, sans-serif" font-size="18" letter-spacing="1">
     MINUTES
   </text>
 
@@ -109,7 +109,7 @@ export default function handler(req, res) {
     ${s}
   </text>
   <text x="${cxSeconds}" y="${cy + 18}" text-anchor="middle" fill="#cccccc"
-    font-family="Arial, sans-serif" font-size="23" letter-spacing="1">
+    font-family="Arial, sans-serif" font-size="18" letter-spacing="1">
     SECONDS
   </text>
 </svg>`;
