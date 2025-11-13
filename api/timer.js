@@ -61,11 +61,8 @@ export default function handler(req, res) {
   const secondsTicks = makeTicks(cxSeconds, cy, seconds, 60, 60);
 
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
-<svg width="760" height="200" viewBox="0 0 760 200" xmlns="http://www.w3.org/2000/svg">
-  <!-- Black background -->
-  <rect width="760" height="200" fill="#000000" />
 
-  <defs>
+    <defs>
     <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
       <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
       <feMerge>
@@ -74,7 +71,10 @@ export default function handler(req, res) {
       </feMerge>
     </filter>
   </defs>
-
+  
+<svg width="760" height="200" viewBox="0 0 760 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Black background -->
+  <rect width="760" height="200" fill="#000000" />
 
   <!-- DAYS circle -->
   ${daysTicks}
