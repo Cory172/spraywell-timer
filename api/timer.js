@@ -17,7 +17,7 @@ function makeTicks(cx, cy, value, maxValue, segments = 60) {
 
     const color = i < activeSegments ? "#7cc516" : "#222222";
 
-    svg += `<line filter="url(#glow)"
+    svg += `<line
       x1="${x1.toFixed(2)}" y1="${y1.toFixed(2)}"
       x2="${x2.toFixed(2)}" y2="${y2.toFixed(2)}"
       stroke="${color}" stroke-width="3" />`;
@@ -60,17 +60,6 @@ export default function handler(req, res) {
 
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg width="760" height="200" viewBox="0 0 760 200" xmlns="http://www.w3.org/2000/svg">
-
-  <!-- Glow filter (must be first) -->
-  <defs>
-    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="5" result="coloredBlur"/>
-      <feMerge>
-        <feMergeNode in="coloredBlur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-  </defs>
 
   <!-- Black background -->
   <rect width="760" height="200" fill="#000000" />
