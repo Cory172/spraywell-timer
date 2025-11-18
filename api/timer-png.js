@@ -67,44 +67,44 @@ function buildTimerSvg(endParam) {
   ${daysTicks}
   <circle cx="${cxDays}" cy="${cy}" r="60" fill="#000000" />
   <text x="${cxDays}" y="${cy - 5}" text-anchor="middle" fill="#ffffff"
-    font-family="Arial, sans-serif" font-size="42" font-weight="bold">
+    font-family="sans-serif" font-size="42" font-weight="bold">
     ${d}
   </text>
   <text x="${cxDays}" y="${cy + 18}" text-anchor="middle" fill="#cccccc"
-    font-family="Arial, sans-serif" font-size="18" letter-spacing="1">
+    font-family="sans-serif" font-size="18" letter-spacing="1">
     DAYS
   </text>
 
   ${hoursTicks}
   <circle cx="${cxHours}" cy="${cy}" r="60" fill="#000000" />
   <text x="${cxHours}" y="${cy - 5}" text-anchor="middle" fill="#ffffff"
-    font-family="Arial, sans-serif" font-size="42" font-weight="bold">
+    font-family="sans-serif" font-size="42" font-weight="bold">
     ${h}
   </text>
   <text x="${cxHours}" y="${cy + 18}" text-anchor="middle" fill="#cccccc"
-    font-family="Arial, sans-serif" font-size="18" letter-spacing="1">
+    font-family="sans-serif" font-size="18" letter-spacing="1">
     HOURS
   </text>
 
   ${minutesTicks}
   <circle cx="${cxMinutes}" cy="${cy}" r="60" fill="#000000" />
   <text x="${cxMinutes}" y="${cy - 5}" text-anchor="middle" fill="#ffffff"
-    font-family="Arial, sans-serif" font-size="42" font-weight="bold">
+    font-family="sans-serif" font-size="42" font-weight="bold">
     ${m}
   </text>
   <text x="${cxMinutes}" y="${cy + 18}" text-anchor="middle" fill="#cccccc"
-    font-family="Arial, sans-serif" font-size="18" letter-spacing="1">
+    font-family="sans-serif" font-size="18" letter-spacing="1">
     MINUTES
   </text>
 
   ${secondsTicks}
   <circle cx="${cxSeconds}" cy="${cy}" r="60" fill="#000000" />
   <text x="${cxSeconds}" y="${cy - 5}" text-anchor="middle" fill="#ffffff"
-    font-family="Arial, sans-serif" font-size="42" font-weight="bold">
+    font-family="sans-serif" font-size="42" font-weight="bold">
     ${s}
   </text>
   <text x="${cxSeconds}" y="${cy + 18}" text-anchor="middle" fill="#cccccc"
-    font-family="Arial, sans-serif" font-size="18" letter-spacing="1">
+    font-family="sans-serif" font-size="18" letter-spacing="1">
     SECONDS
   </text>
 </svg>`;
