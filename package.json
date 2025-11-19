@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "gifencoder": "^2.0.1",
-    "skia-canvas": "^1.0.0"
+    "sharp": "^0.33.3"
   }
 }
