@@ -1,12 +1,16 @@
 import GIFEncoder from "gifencoder";
-import { createCanvas } from "canvas";
+import { Canvas } from "skia-canvas";
 
-// Draw the tick "slices" around a circle
+export const config = {
+  runtime: "nodejs18.x"
+};
+
+// Draw circular ticks
 function drawTicks(ctx, cx, cy, value, maxValue, segments = 60) {
   const outerR = 80;
   const innerR = 65;
 
-  const activeSegments = Math.round(
+  const active = Math.round(
     Math.max(0, Math.min(1, value / maxValue)) * segments
   );
 
@@ -20,13 +24,12 @@ function drawTicks(ctx, cx, cy, value, maxValue, segments = 60) {
     ctx.beginPath();
     ctx.moveTo(x1, y1);
     ctx.lineTo(x2, y2);
-    ctx.strokeStyle = i < activeSegments ? "#7cc516" : "#222222";
+    ctx.strokeStyle = i < active ? "#7cc516" : "#222222";
     ctx.lineWidth = 3;
     ctx.stroke();
   }
 }
 
-// Draw one frame of the timer onto the canvas
 function drawFrame(ctx, now, endDate) {
   let diff = endDate - now;
   if (diff < 0) diff = 0;
@@ -45,120 +48,76 @@ function drawFrame(ctx, now, endDate) {
   const width = 760;
   const height = 200;
 
-  // Clear + background
   ctx.fillStyle = "#000000";
   ctx.fillRect(0, 0, width, height);
 
-  // Positions
   const cy = 100;
   const cxDays = 110;
   const cxHours = 290;
   const cxMinutes = 470;
   const cxSeconds = 650;
 
-  // DAYS
-  drawTicks(ctx, cxDays, cy, Math.min(days, 60), 60, 60);
-  ctx.beginPath();
-  ctx.arc(cxDays, cy, 60, 0, 2 * Math.PI);
-  ctx.fillStyle = "#000000";
-  ctx.fill();
-
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  ctx.fillStyle = "#ffffff";
-  ctx.font = "bold 42px sans-serif";
-  ctx.fillText(d, cxDays, cy - 5);
+  function drawCircle(label, val, x, max) {
+    drawTicks(ctx, x, cy, val, max);
 
-  ctx.fillStyle = "#cccccc";
-  ctx.font = "18px sans-serif";
-  ctx.fillText("DAYS", cxDays, cy + 22);
+    ctx.beginPath();
+    ctx.arc(x, cy, 60, 0, Math.PI * 2);
+    ctx.fillStyle = "#000";
+    ctx.fill();
 
-  // HOURS
-  drawTicks(ctx, cxHours, cy, hours, 24, 60);
-  ctx.beginPath();
-  ctx.arc(cxHours, cy, 60, 0, 2 * Math.PI);
-  ctx.fillStyle = "#000000";
-  ctx.fill();
+    ctx.fillStyle = "#fff";
+    ctx.font = "bold 42px sans-serif";
+    ctx.fillText(val, x, cy - 5);
 
-  ctx.fillStyle = "#ffffff";
-  ctx.font = "bold 42px sans-serif";
-  ctx.fillText(h, cxHours, cy - 5);
+    ctx.fillStyle = "#ccc";
+    ctx.font = "18px sans-serif";
+    ctx.fillText(label, x, cy + 22);
+  }
 
-  ctx.fillStyle = "#cccccc";
-  ctx.font = "18px sans-serif";
-  ctx.fillText("HOURS", cxHours, cy + 22);
-
-  // MINUTES
-  drawTicks(ctx, cxMinutes, cy, minutes, 60, 60);
-  ctx.beginPath();
-  ctx.arc(cxMinutes, cy, 60, 0, 2 * Math.PI);
-  ctx.fillStyle = "#000000";
-  ctx.fill();
-
-  ctx.fillStyle = "#ffffff";
-  ctx.font = "bold 42px sans-serif";
-  ctx.fillText(m, cxMinutes, cy - 5);
-
-  ctx.fillStyle = "#cccccc";
-  ctx.font = "18px sans-serif";
-  ctx.fillText("MINUTES", cxMinutes, cy + 22);
-
-  // SECONDS
-  drawTicks(ctx, cxSeconds, cy, seconds, 60, 60);
-  ctx.beginPath();
-  ctx.arc(cxSeconds, cy, 60, 0, 2 * Math.PI);
-  ctx.fillStyle = "#000000";
-  ctx.fill();
-
-  ctx.fillStyle = "#ffffff";
-  ctx.font = "bold 42px sans-serif";
-  ctx.fillText(s, cxSeconds, cy - 5);
-
-  ctx.fillStyle = "#cccccc";
-  ctx.font = "18px sans-serif";
-  ctx.fillText("SECONDS", cxSeconds, cy + 22);
+  drawCircle("DAYS", d, cxDays, 60);
+  drawCircle("HOURS", h, cxHours, 24);
+  drawCircle("MINUTES", m, cxMinutes, 60);
+  drawCircle("SECONDS", s, cxSeconds, 60);
 }
 
 export default async function handler(req, res) {
   try {
-    // End time: Black Friday launch at midnight EST -> 05:00:00Z
-    const endParam = req.query.end;
-    const endDate = endParam
-      ? new Date(endParam)
+    const end = req.query.end
+      ? new Date(req.query.end)
       : new Date("2025-11-28T05:00:00Z");
 
     const width = 760;
     const height = 200;
 
     const encoder = new GIFEncoder(width, height);
-    const canvas = createCanvas(width, height);
-    const ctx = canvas.getContext("2d");
+    const stream = encoder.createReadStream();
 
     res.setHeader("Content-Type", "image/gif");
-    res.setHeader("Cache-Control", "no-store, max-age=0");
-
-    encoder.createReadStream().pipe(res);
+    res.setHeader("Cache-Control", "no-store");
+    stream.pipe(res);
 
     encoder.start();
-    encoder.setRepeat(0); // loop forever
-    encoder.setDelay(1000); // 1000 ms per frame
-    encoder.setQuality(10); // 1 is best, 20 is worst
+    encoder.setRepeat(0);
+    encoder.setDelay(1000);
+    encoder.setQuality(10);
 
-    const nowBase = Date.now();
+    const canvas = new Canvas(width, height);
+    const ctx = canvas.getContext("2d");
 
-    // 60 frames = ~60 seconds of ticking
-    const frames = 60;
+    const base = Date.now();
 
-    for (let i = 0; i < frames; i++) {
-      const now = new Date(nowBase + i * 1000);
-      drawFrame(ctx, now, endDate);
+    for (let i = 0; i < 60; i++) {
+      const now = new Date(base + i * 1000);
+      drawFrame(ctx, now, end);
       encoder.addFrame(ctx);
     }
 
     encoder.finish();
   } catch (err) {
     console.error(err);
-    res.status(500).send("Timer GIF generation error");
+    res.status(500).send("GIF generation error");
   }
 }
