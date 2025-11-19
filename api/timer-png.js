@@ -119,7 +119,7 @@ export default async function handler(req, res) {
     const pngBuffer = await sharp(Buffer.from(svg)).png().toBuffer();
 
     res.setHeader("Content-Type", "image/png");
-    res.setHeader("Cache-Control", "no-store, max-age=0");
+    res.setHeader("Cache-Control", "public, max-age=60");
     res.send(pngBuffer);
   } catch (err) {
     console.error(err);
