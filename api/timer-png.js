@@ -1,5 +1,7 @@
-import sharp from "sharp";
+// api/timer-png.js
+const sharp = require("sharp");
 
+// Draw the tick marks around each circle
 function makeTicks(cx, cy, value, maxValue, segments = 60) {
   let svg = "";
   const outerR = 80;
@@ -28,11 +30,12 @@ function makeTicks(cx, cy, value, maxValue, segments = 60) {
   return svg;
 }
 
-// Build the SVG string (same design as your timer.js)
+// Build the SVG for the timer
 function buildTimerSvg(endParam) {
+  // Midnight EST on 11/28/2025 = 05:00:00 UTC
   const endDate = endParam
     ? new Date(endParam)
-    : new Date("2025-11-28T05:00:00Z"); // Midnight EST (UTC-5)
+    : new Date("2025-11-28T05:00:00Z");
 
   const now = new Date();
   let diff = endDate - now;
@@ -67,44 +70,44 @@ function buildTimerSvg(endParam) {
   ${daysTicks}
   <circle cx="${cxDays}" cy="${cy}" r="60" fill="#000000" />
   <text x="${cxDays}" y="${cy - 5}" text-anchor="middle" fill="#ffffff"
-    font-family="sans-serif" font-size="42" font-weight="bold">
+    font-family="Arial, sans-serif" font-size="42" font-weight="bold">
     ${d}
   </text>
   <text x="${cxDays}" y="${cy + 18}" text-anchor="middle" fill="#cccccc"
-    font-family="sans-serif" font-size="18" letter-spacing="1">
+    font-family="Arial, sans-serif" font-size="18" letter-spacing="1">
     DAYS
   </text>
 
   ${hoursTicks}
   <circle cx="${cxHours}" cy="${cy}" r="60" fill="#000000" />
   <text x="${cxHours}" y="${cy - 5}" text-anchor="middle" fill="#ffffff"
-    font-family="sans-serif" font-size="42" font-weight="bold">
+    font-family="Arial, sans-serif" font-size="42" font-weight="bold">
     ${h}
   </text>
   <text x="${cxHours}" y="${cy + 18}" text-anchor="middle" fill="#cccccc"
-    font-family="sans-serif" font-size="18" letter-spacing="1">
+    font-family="Arial, sans-serif" font-size="18" letter-spacing="1">
     HOURS
   </text>
 
   ${minutesTicks}
   <circle cx="${cxMinutes}" cy="${cy}" r="60" fill="#000000" />
   <text x="${cxMinutes}" y="${cy - 5}" text-anchor="middle" fill="#ffffff"
-    font-family="sans-serif" font-size="42" font-weight="bold">
+    font-family="Arial, sans-serif" font-size="42" font-weight="bold">
     ${m}
   </text>
   <text x="${cxMinutes}" y="${cy + 18}" text-anchor="middle" fill="#cccccc"
-    font-family="sans-serif" font-size="18" letter-spacing="1">
+    font-family="Arial, sans-serif" font-size="18" letter-spacing="1">
     MINUTES
   </text>
 
   ${secondsTicks}
   <circle cx="${cxSeconds}" cy="${cy}" r="60" fill="#000000" />
   <text x="${cxSeconds}" y="${cy - 5}" text-anchor="middle" fill="#ffffff"
-    font-family="sans-serif" font-size="42" font-weight="bold">
+    font-family="Arial, sans-serif" font-size="42" font-weight="bold">
     ${s}
   </text>
   <text x="${cxSeconds}" y="${cy + 18}" text-anchor="middle" fill="#cccccc"
-    font-family="sans-serif" font-size="18" letter-spacing="1">
+    font-family="Arial, sans-serif" font-size="18" letter-spacing="1">
     SECONDS
   </text>
 </svg>`;
@@ -112,17 +115,19 @@ function buildTimerSvg(endParam) {
   return svg;
 }
 
-export default async function handler(req, res) {
+// Vercel Node handler (CommonJS)
+module.exports = async (req, res) => {
   try {
-    const svg = buildTimerSvg(req.query.end);
+    const endParam = req.query && req.query.end;
+    const svg = buildTimerSvg(endParam);
 
     const pngBuffer = await sharp(Buffer.from(svg)).png().toBuffer();
 
     res.setHeader("Content-Type", "image/png");
-    res.setHeader("Cache-Control", "public, max-age=60");
-    res.send(pngBuffer);
+    res.setHeader("Cache-Control", "no-store, max-age=0");
+    res.status(200).send(pngBuffer);
   } catch (err) {
     console.error(err);
     res.status(500).send("Timer PNG generation error");
   }
-}
+};
